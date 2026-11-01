@@ -50,21 +50,4 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/task-manager:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/task-manager:${{ github.sha }}
 
-  deploy:
-    name: Deploy to AWS EC2
-    needs: publish
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/task-manager
-            export IMAGE_TAG=latest
-            docker compose pull app
-            docker compose up -d --remove-orphans
-            docker image prune -f
+  
