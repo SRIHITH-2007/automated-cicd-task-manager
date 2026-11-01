@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskFlow | Task Manager</title>
+  <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<header class="topbar"><div class="brand"><span class="brand-mark">✓</span><span>TaskFlow</span></div><span class="tag">CI/CD DEMO</span></header>
+<main class="container">
+  <section class="intro"><p class="eyebrow">YOUR WORKSPACE</p><h1>Make progress, <span>one task at a time.</span></h1><p class="sub">A simple task manager powered by Java, Spring Boot and an automated deployment pipeline.</p></section>
+  <section class="stats">
+    <article class="stat"><span>Total tasks</span><strong th:text="${total}">0</strong></article>
+    <article class="stat"><span>Completed</span><strong th:text="${completed}">0</strong></article>
+    <article class="stat"><span>Remaining</span><strong th:text="${total - completed}">0</strong></article>
+  </section>
+  <div class="notice" th:if="${message}" th:text="${message}"></div>
+  <section class="panel">
+    <h2>Add a task</h2>
+    <form th:action="@{/tasks}" th:object="${task}" method="post" class="task-form">
+      <div class="field"><label for="title">Task title</label><input id="title" type="text" th:field="*{title}" placeholder="e.g. Finish CI/CD pipeline" maxlength="120" required><small class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></div>
+      <div class="field"><label for="description">Description <span>(optional)</span></label><input id="description" type="text" th:field="*{description}" placeholder="Add a few details..." maxlength="500"><small class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small></div>
+      <button class="primary" type="submit">＋ Add task</button>
+    </form>
+  </section>
+  <section class="task-section"><div class="section-heading"><h2>Your tasks</h2><span class="count" th:text="${total} + ' items'">0 items</span></div>
+    <div class="empty" th:if="${#lists.isEmpty(tasks)}"><div class="empty-icon">✦</div><h3>No tasks yet</h3><p>Add your first task above to get started.</p></div>
+    <article class="task" th:each="item : ${tasks}">
+      <form th:action="@{/tasks/{id}/toggle(id=${item.id})}" method="post"><button class="check" th:classappend="${item.completed} ? ' checked' : ''" type="submit" th:attr="aria-label=${item.completed} ? 'Mark incomplete' : 'Mark complete'"><span th:if="${item.completed}">✓</span></button></form>
+      <div class="task-copy"><h3 th:classappend="${item.completed} ? ' done' : ''" th:text="${item.title}">Task title</h3><p th:if="${item.description != null and !item.description.isBlank()}" th:text="${item.description}">Description</p><small th:text="${item.createdAt}">Date</small></div>
+      <span class="status" th:classappend="${item.completed} ? ' status-done' : ''" th:text="${item.completed} ? 'Completed' : 'In progress'">In progress</span>
+      <form th:action="@{/tasks/{id}/delete(id=${item.id})}" method="post"><button class="delete" type="submit" aria-label="Delete task" onclick="return confirm('Delete this task?')">×</button></form>
+    </article>
+  </section>
+  <footer>TaskFlow · Built to demonstrate automated CI/CD</footer>
+</main>
+</body></html>
